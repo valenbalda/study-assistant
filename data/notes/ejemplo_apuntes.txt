@@ -1,0 +1,3 @@
+Definición: Una proposición es un enunciado que puede ser verdadero o falso.
+Proceso: Para construir una tabla de verdad, se listan todas las combinaciones posibles de valores.
+Propiedad: Una tautología es verdadera para todas las valuaciones.
