@@ -2,7 +2,7 @@ from uuid import uuid4
 from datetime import datetime
 
 from storage import load_errors, save_errors
-
+from analytics import top_by, recommendations
 
 VALID_TYPES = {
     "conceptual",
@@ -68,19 +68,48 @@ def list_errors() -> None:
         print(f"- [{e['subject']}] {e['topic']} | {e['error_type']} | sev={e['severity']} | {e['created_at']}")
     print("")
 
+def show_dashboard() -> None:
+    errors = load_errors()
+    print("\n=== DASHBOARD ===")
+    print(f"Total de errores: {len(errors)}\n")
+
+    print("Top temas:")
+    top_topics = top_by(errors, "topic", n=5)
+    if top_topics:
+        for k, v in top_topics:
+            print(f"- {k}: {v}")
+    else:
+        print("- (sin datos)")
+
+    print("\nTop tipos de error:")
+    top_types = top_by(errors, "error_type", n=5)
+    if top_types:
+        for k, v in top_types:
+            print(f"- {k}: {v}")
+    else:
+        print("- (sin datos)")
+
+    print("\nRecomendaciones:")
+    for r in recommendations(errors):
+        print(f"- {r}")
+    print("")
 
 def run() -> None:
     while True:
         print("=== Study Assistant ===")
         print("1) Registrar error")
         print("2) Ver últimos errores")
+        print("3) Ver dashboard (análisis + recomendaciones)")
         print("0) Salir")
+
         opt = input("Opción: ").strip()
 
         if opt == "1":
             add_error()
         elif opt == "2":
             list_errors()
+        elif opt == "3":
+            show_dashboard()
         elif opt == "0":
             print("Listo.")
             break
