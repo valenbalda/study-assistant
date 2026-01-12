@@ -3,6 +3,8 @@ from datetime import datetime
 
 from storage import load_errors, save_errors
 from analytics import top_by, recommendations
+from simulator import run_simulacrum
+
 
 VALID_TYPES = {
     "conceptual",
@@ -64,9 +66,13 @@ def list_errors() -> None:
         return
 
     print("\n=== ERRORES REGISTRADOS ===")
-    for e in errors[-10:]:  # últimos 10
-        print(f"- [{e['subject']}] {e['topic']} | {e['error_type']} | sev={e['severity']} | {e['created_at']}")
+    for e in errors[-10:]:
+        print(
+            f"- [{e['subject']}] {e['topic']} | "
+            f"{e['error_type']} | sev={e['severity']} | {e['created_at']}"
+        )
     print("")
+
 
 def show_dashboard() -> None:
     errors = load_errors()
@@ -94,28 +100,31 @@ def show_dashboard() -> None:
         print(f"- {r}")
     print("")
 
+
+def load_notes_text() -> str:
+    print("\nApuntes: podés pegar texto y terminar con una línea 'END'.")
+    print("O elegir (a) para cargar data/notes/ejemplo_apuntes.txt\n")
+    mode = input("Pegás ahora (p) / Cargar archivo (a): ").strip().lower()
+
+    if mode == "p":
+        print("Pegá tus apuntes. Escribí END en una línea sola para terminar:")
+        lines = []
+        while True:
+            line = input()
+            if line.strip() == "END":
+                break
+            lines.append(line)
+        return "\n".join(lines).strip()
+
+    path = "data/notes/ejemplo_apuntes.txt"
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            return f.read()
+    except FileNotFoundError:
+        print(f"No encontré {path}. Crealo y probá de nuevo.")
+        return ""
+
+
 def run() -> None:
     while True:
         print("=== Study Assistant ===")
-        print("1) Registrar error")
-        print("2) Ver últimos errores")
-        print("3) Ver dashboard (análisis + recomendaciones)")
-        print("0) Salir")
-
-        opt = input("Opción: ").strip()
-
-        if opt == "1":
-            add_error()
-        elif opt == "2":
-            list_errors()
-        elif opt == "3":
-            show_dashboard()
-        elif opt == "0":
-            print("Listo.")
-            break
-        else:
-            print("Opción inválida.\n")
-
-
-if __name__ == "__main__":
-    run()
