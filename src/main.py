@@ -1,4 +1,3 @@
-print(">>> ARRANCO MAIN.PY <<<")
 from uuid import uuid4
 from datetime import datetime
 
@@ -129,3 +128,6 @@ def load_notes_text() -> str:
 def run() -> None:
     while True:
         print("=== Study Assistant ===")
+        if __name__ == "__main__":
+    run()
+
