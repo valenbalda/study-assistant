@@ -21,9 +21,8 @@ def now_iso() -> str:
 
 def input_int(prompt: str, min_v: int, max_v: int) -> int:
     while True:
-        s = input(prompt).strip()
         try:
-            v = int(s)
+            v = int(input(prompt).strip())
             if min_v <= v <= max_v:
                 return v
         except ValueError:
@@ -33,12 +32,11 @@ def input_int(prompt: str, min_v: int, max_v: int) -> int:
 
 def add_error() -> None:
     subject = input("Materia: ").strip()
-    topic = input("Tema (ej: derivadas, cuantificadores, RT 54): ").strip()
+    topic = input("Tema: ").strip()
 
     print("Tipos posibles: conceptual | procedure | calculation | reading | distraction")
     error_type = input("Tipo de error: ").strip().lower()
     if error_type not in VALID_TYPES:
-        print("Tipo inválido. Se guarda como 'conceptual'.")
         error_type = "conceptual"
 
     severity = input_int("Severidad (1-5): ", 1, 5)
@@ -56,13 +54,13 @@ def add_error() -> None:
     })
     save_errors(errors)
 
-    print("\n✅ Error registrado y guardado en data/errors.json.\n")
+    print("\n✅ Error registrado.\n")
 
 
 def list_errors() -> None:
     errors = load_errors()
     if not errors:
-        print("\nNo hay errores cargados todavía.\n")
+        print("\nNo hay errores cargados.\n")
         return
 
     print("\n=== ERRORES REGISTRADOS ===")
@@ -80,20 +78,12 @@ def show_dashboard() -> None:
     print(f"Total de errores: {len(errors)}\n")
 
     print("Top temas:")
-    top_topics = top_by(errors, "topic", n=5)
-    if top_topics:
-        for k, v in top_topics:
-            print(f"- {k}: {v}")
-    else:
-        print("- (sin datos)")
+    for k, v in top_by(errors, "topic", 5):
+        print(f"- {k}: {v}")
 
     print("\nTop tipos de error:")
-    top_types = top_by(errors, "error_type", n=5)
-    if top_types:
-        for k, v in top_types:
-            print(f"- {k}: {v}")
-    else:
-        print("- (sin datos)")
+    for k, v in top_by(errors, "error_type", 5):
+        print(f"- {k}: {v}")
 
     print("\nRecomendaciones:")
     for r in recommendations(errors):
@@ -102,32 +92,58 @@ def show_dashboard() -> None:
 
 
 def load_notes_text() -> str:
-    print("\nApuntes: podés pegar texto y terminar con una línea 'END'.")
-    print("O elegir (a) para cargar data/notes/ejemplo_apuntes.txt\n")
-    mode = input("Pegás ahora (p) / Cargar archivo (a): ").strip().lower()
+    print("\nApuntes:")
+    print("p = pegar texto")
+    print("a = usar data/notes/ejemplo_apuntes.txt")
+    mode = input("Opción: ").strip().lower()
 
     if mode == "p":
-        print("Pegá tus apuntes. Escribí END en una línea sola para terminar:")
+        print("Pegá el texto. Escribí END para terminar:")
         lines = []
         while True:
             line = input()
             if line.strip() == "END":
                 break
             lines.append(line)
-        return "\n".join(lines).strip()
+        return "\n".join(lines)
 
-    path = "data/notes/ejemplo_apuntes.txt"
     try:
-        with open(path, "r", encoding="utf-8") as f:
+        with open("data/notes/ejemplo_apuntes.txt", "r", encoding="utf-8") as f:
             return f.read()
     except FileNotFoundError:
-        print(f"No encontré {path}. Crealo y probá de nuevo.")
+        print("No se encontró el archivo de apuntes.")
         return ""
 
 
 def run() -> None:
     while True:
         print("=== Study Assistant ===")
-        if __name__ == "__main__":
-    run()
+        print("1) Registrar error")
+        print("2) Ver últimos errores")
+        print("3) Ver dashboard")
+        print("4) Hacer simulacro")
+        print("0) Salir")
 
+        opt = input("Opción: ").strip()
+
+        if opt == "1":
+            add_error()
+        elif opt == "2":
+            list_errors()
+        elif opt == "3":
+            show_dashboard()
+        elif opt == "4":
+            subject = input("Materia: ").strip()
+            notes = load_notes_text()
+            if notes:
+                n = input_int("Cantidad de preguntas (5-20): ", 5, 20)
+                run_simulacrum(subject, notes, n)
+        elif opt == "0":
+            print("Listo.")
+            break
+        else:
+            print("Opción inválida.\n")
+
+
+if __name__ == "__main__":
+    run()
